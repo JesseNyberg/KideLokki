@@ -9,7 +9,7 @@
 
 ## Features
 
-  <img src="https://raw.githubusercontent.com/skotfrii2/skotfrii2.github.io/main/kidelokkislide.gif" width="350" height="600"/>
+  <img src="https://raw.githubusercontent.com/skotfrii2/skotfrii2.github.io/main/kidelokkislide.gif" width="250" height="450"/>
   
 - ### **AUTH Login**: 
   - #### The app uses kide.app credentials to retrieve an access token for the reserving.
