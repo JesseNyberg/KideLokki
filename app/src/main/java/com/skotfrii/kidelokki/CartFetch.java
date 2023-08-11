@@ -128,10 +128,7 @@ public class CartFetch {
             }
 
             resultProduct.setText(productText.toString().trim());
-            resultProduct.setTextColor(Color.WHITE);
-
             resultVariant.setText(variantText.toString().trim());
-            resultVariant.setTextColor(Color.WHITE);
 
             animateInCardView();
             animateIn(resultProduct);
