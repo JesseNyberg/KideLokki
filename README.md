@@ -9,8 +9,8 @@
 
 ## Features
 
-  ![](https://skotfrii2.github.io/kidelokkislide.mp4)
-
+  ![](https://raw.githubusercontent.com/skotfrii2/skotfrii2.github.io/main/kidelokkislide.gif)
+  
 - ### **AUTH Login**: 
   - #### The app uses kide.app credentials to retrieve an access token for the reserving.
     
