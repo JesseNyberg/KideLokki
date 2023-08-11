@@ -143,7 +143,7 @@
                 android:id="@+id/cancelButton"
                 android:layout_width="wrap_content"
                 android:layout_height="30dp"
-                android:visibility="invisible"
+                android:visibility="gone"
                 android:layout_gravity="center_horizontal"
                 android:layout_marginTop="10dp"
                 android:background="@drawable/login_button_background"
@@ -158,10 +158,18 @@
                 android:layout_marginTop="20dp"
                 android:layout_marginStart="160dp"
                 android:textSize="24sp"
-                android:visibility="visible"
+                android:visibility="gone"
                 />
 
-
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyleHorizontal"
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:indeterminate="true"
+                android:visibility="gone"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="15dp"/>
 
 
 

@@ -28,7 +28,7 @@ public class ReserveBackgroundService extends Service {
     private SharedPreferences sharedPrefs;
     private SharedPreferences.Editor editor;
 
-    private CountDownTimer countDownTimer;
+    private CountDownTimer countDownTimer = null;
 
     private MainActivity mainActivity;
 
@@ -65,9 +65,6 @@ public class ReserveBackgroundService extends Service {
     }
 
     public void startReservation(long timeRemaining) {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
 
         sharedPrefs.edit().putBoolean("isCountdownActive", true).apply();
 
@@ -100,6 +97,7 @@ public class ReserveBackgroundService extends Service {
     public void onDestroy() {
         super.onDestroy();
         sharedPrefs.edit().putBoolean("isServiceRunning", false).apply();
+        sharedPrefs.edit().putBoolean("isCountdownActive", false).apply();
     }
 
     @Nullable
@@ -128,8 +126,8 @@ public class ReserveBackgroundService extends Service {
         return new NotificationCompat.Builder(this, CHANNEL_ID)
                 .setContentTitle("Reserve Background Service")
                 .setContentText("Running...")
-                //.setSmallIcon(R.drawable.seagull)
-                .setPriority(NotificationCompat.PRIORITY_MIN) // Set the priority to minimize notification visibility
+                .setSmallIcon(R.drawable.seagull)
+                .setPriority(NotificationCompat.PRIORITY_MIN)
                 .setContentIntent(pendingIntent)
                 .build();
     }
@@ -138,11 +136,9 @@ public class ReserveBackgroundService extends Service {
         if (countDownTimer != null) {
             countDownTimer.cancel();
             countDownTimer = null;
-
-
-            sharedPrefs.edit().putBoolean("isServiceRunning", false).apply();
-            stopForeground(true);
-            stopSelf();
         }
+
+        sharedPrefs.edit().putBoolean("isServiceRunning", false).apply();
+        sharedPrefs.edit().putBoolean("isCountdownActive", false).apply();
     }
 }

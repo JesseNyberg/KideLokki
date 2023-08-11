@@ -16,6 +16,7 @@ import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -38,13 +39,14 @@ public class MainActivity extends AppCompatActivity {
     private EditText inputUrl;
     private UrlValidator urlValidator;
     private Button reserveButton;
+    private Button cancelButton;
     private Spinner quantitySpinner;
     private TextView countDownText;
     private TextView invalidText;
     private TextView resultProduct;
     private TextView resultVariant;
+    private ProgressBar progressBar;
     private CardView cardView;
-    private Button cancelButton;
 
     private Root fetchedProduct;
 
@@ -182,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
         resultVariant = findViewById(R.id.resultVariant);
         cardView = findViewById(R.id.cardView3);
         cancelButton = findViewById(R.id.cancelButton);
+        progressBar = findViewById(R.id.progressBar);
 
         reserveButton.setVisibility(View.GONE);
     }
@@ -201,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void onBearerTokenCheckResult(boolean isBearerValid) {
         if (!isBearerValid) {
-            Toast.makeText(this, "Bearer token is invalid. Redirect to login.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Bearer token is invalid. Redirecting to login.", Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
         }
@@ -212,15 +215,31 @@ public class MainActivity extends AppCompatActivity {
      */
     public void handleProductFetch() {
         animateOutResult();
-        if (checkUrlStatus()) {
-            return;
-        }
+        if (checkUrlStatus()) { return; }
 
-        //boolean isServiceRunning = sharedPrefs.getBoolean("isServiceRunning", false);
+        restartService();
 
-
+        progressBar.setVisibility(View.VISIBLE);
 
         fetchProductData();
+    }
+
+    public void restartService() {
+        // Unbind from the service if it was previously bound
+        if (bound) {
+            unbindService(connection);
+            bound = false;
+
+            // Stop the service
+            stopService(serviceIntent);
+        }
+
+        // Start the service again
+        startService(serviceIntent);
+
+        // Bind to the service again
+        bindService(serviceIntent, connection, Context.BIND_AUTO_CREATE);
+        bound = true;
     }
 
     /**
@@ -250,16 +269,21 @@ public class MainActivity extends AppCompatActivity {
         return fetchedProduct -> {
             MainActivity.this.fetchedProduct = fetchedProduct;
 
+            progressBar.setVisibility(View.GONE);
+
             if (fetchedProduct != null) {
                 Boolean salesStarted = fetchedProduct.model.product.salesStarted;
                 boolean salesEnded = fetchedProduct.model.product.salesEnded;
 
                 if (salesEnded) {
                     showToast("Sales have ended.");
+                    reserveButton.setEnabled(true);
+                    reserveButton.setAlpha(1.0f);
+
                 } else {
                     timeRemainingMillis = fetchedProduct.model.product.timeUntilSalesStart;
                     timeRemainingMillis *= 1000;
-                    handleSalesStart(salesStarted, fetchedProduct);
+                    handleSalesStart(salesStarted);
                 }
             }
         };
@@ -269,9 +293,8 @@ public class MainActivity extends AppCompatActivity {
      * Checks if sales have already started
      * and if not, a countdown timer starts
      * @param salesStarted .
-     * @param fetchedProduct .
      */
-    private void handleSalesStart(Boolean salesStarted, Root fetchedProduct) {
+    private void handleSalesStart(Boolean salesStarted) {
         if (!salesStarted) {
             if (timeRemainingMillis > 0) {
                 countDownText.setVisibility(View.VISIBLE);
@@ -318,8 +341,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void cancelCountdown() {
-        sharedPrefs.edit().putBoolean("isCountdownActive", false).apply();
-
         reserveBackgroundService.cancelCountdown();
         stopService(serviceIntent);
 
@@ -328,11 +349,10 @@ public class MainActivity extends AppCompatActivity {
            bound = false;
         }
 
-
-        countDownText.setVisibility(View.INVISIBLE);  // Make the countDownText invisible
+        countDownText.setVisibility(View.GONE);  // Make the countDownText invisible
         reserveButton.setEnabled(true);               // Enable the reserveButton
         reserveButton.setAlpha(1.0f);                 // Make sure the reserveButton is fully opaque
-        cancelButton.setVisibility(View.INVISIBLE);
+        cancelButton.setVisibility(View.GONE);
     }
 
 

@@ -47,7 +47,6 @@ public class CheckBearerTask {
                 showToast("Token doesn't exist");
                 return false;
             }
-            Log.d("Bearer token: ", bearerToken);
 
             Request request = constructBearerRequest();
             return executeRequest(request);
