@@ -215,6 +215,7 @@ public class MainActivity extends AppCompatActivity {
      */
     public void handleProductFetch() {
         animateOutResult();
+
         if (checkUrlStatus()) { return; }
 
         restartService();
@@ -257,6 +258,7 @@ public class MainActivity extends AppCompatActivity {
             err.printStackTrace();
             reserveButton.setEnabled(true);
             reserveButton.setAlpha(1.0f);
+            cancelButton.setVisibility(View.GONE);
         }
     }
 
@@ -279,6 +281,7 @@ public class MainActivity extends AppCompatActivity {
                     showToast("Sales have ended.");
                     reserveButton.setEnabled(true);
                     reserveButton.setAlpha(1.0f);
+                    cancelButton.setVisibility(View.GONE);
 
                 } else {
                     timeRemainingMillis = fetchedProduct.model.product.timeUntilSalesStart;
@@ -319,7 +322,11 @@ public class MainActivity extends AppCompatActivity {
             showToast("Reserving failed");
             reserveButton.setEnabled(true);
             reserveButton.setAlpha(1.0f);
+            cancelButton.setVisibility(View.GONE);
+            return;
         }
+
+        cancelButton.setVisibility(View.GONE);
         reserveButton.setEnabled(true);
         reserveButton.setAlpha(1.0f);
     }
